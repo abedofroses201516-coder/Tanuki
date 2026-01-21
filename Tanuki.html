@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tanuki Story: Reading + Grammar Quiz (50 Questions)</title>
+  <style>
+    :root { --border:#ddd; --bg:#fafafa; --wrong:#ffe5e5; --wrong-border:#ff5a5a; }
+    body { font-family: Arial, Helvetica, sans-serif; margin: 0; background: var(--bg); color:#111; }
+    .wrap { max-width: 980px; margin: 24px auto; padding: 0 16px 40px; }
+    h1 { margin: 0 0 10px; font-size: 22px; }
+    .sub { margin: 0 0 18px; color:#444; line-height: 1.4; }
+    .card { background:#fff; border:1px solid var(--border); border-radius: 12px; padding: 16px; margin: 12px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .passage h2, .quiz h2 { margin: 0 0 10px; font-size: 18px; }
+    .passage p { margin: 10px 0; line-height: 1.6; }
+    .small { font-size: 13px; color:#444; line-height: 1.45; }
+    .divider { height: 1px; background: var(--border); margin: 14px 0; }
+    .q { border:1px solid var(--border); border-radius: 12px; padding: 14px; margin: 12px 0; background:#fff; }
+    .q.wrong { background: var(--wrong); border-color: var(--wrong-border); }
+    .qhead { display:flex; gap:10px; align-items:flex-start; }
+    .qnum { font-weight: 700; min-width: 38px; }
+    .qtext { font-weight: 600; line-height: 1.4; }
+    .opts { margin: 10px 0 0; padding-left: 0; list-style: none; }
+    .opt { margin: 8px 0; }
+    label { cursor: pointer; }
+    .feedback { margin-top: 8px; font-size: 14px; }
+    .feedback.wrong { color:#b00020; font-weight: 700; }
+    .actions { display:flex; gap:10px; flex-wrap: wrap; margin: 16px 0 0; }
+    button {
+      border: 1px solid #222; background:#222; color:#fff;
+      padding: 10px 14px; border-radius: 10px; cursor: pointer; font-size: 14px;
+    }
+    button.secondary { background:#fff; color:#222; }
+    button:disabled { opacity: .6; cursor:not-allowed; }
+    #scoreBox { margin-top: 14px; padding: 12px; border-radius: 12px; border:1px solid var(--border); background:#fff; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card passage">
+      <h1>Tanuki Story Quiz (Reading + Grammar)</h1>
+      <p class="sub">
+        Read the passage. Then answer all 50 questions (20 Reading + 30 Grammar).<br/>
+        <span class="small">Rules: 1 point per question. After you submit, you will see your total score. Wrong questions will be highlighted red. Correct answers will NOT be shown.</span>
+      </p>
+
+      <h2>Reading Passage</h2>
+      <p>
+        One day, a traveling salesman walked along a dusty road near a small village. He carried many things to sell,
+        like cups, bowls, cloth, and tools. But he felt tired and sad because no one wanted to buy his goods. The villagers
+        had already seen his things before. He walked to the edge of the village near the forest, hoping to find new customers.
+      </p>
+      <p>
+        Suddenly, he heard a strange sound. It came from the forest. He stopped and listened carefully. He walked into the
+        trees and found a tanuki. The tanuki looked like a raccoon. It was stuck between branches. It looked scared and weak.
+        The salesman felt sorry for the poor animal. He gently moved the branches and freed the tanuki. After it was free, the
+        tanuki ran away into the forest.
+      </p>
+      <p>
+        The next day, the salesman walked his usual road again. He saw an old kettle on the ground. It was rusty, dirty, and ugly.
+        He decided to clean it. That night, he washed it and rubbed it with a cloth until it became shiny. The next morning, he took
+        the kettle to a temple. The monks were serious, and they bought the kettle for a tea ceremony.
+      </p>
+      <p>
+        During the ceremony, something strange happened. The kettle became cold very fast, so they had to heat it again and again.
+        When it was hot, it began to move. At the end of the ceremony, the monks were unhappy and said the kettle was not normal.
+        The next morning, they put the kettle on the fire. Suddenly, it began to change. It grew a tail, soft paws, and a pointed nose.
+        The salesman opened his eyes wide and recognized the tanuki he saved. The tanuki smiled and said it became a kettle to thank him,
+        but being too hot hurt. Everyone laughed. From that day on, the tanuki stayed at the temple as a guest. People came from far away
+        to see the kind tanuki, and the salesman visited often to drink tea from a normal kettle.
+      </p>
+    </div>
+
+    <div class="card quiz">
+      <h2>Quiz Questions</h2>
+      <div class="small">Options will shuffle every time you open or refresh this page.</div>
+      <div class="divider"></div>
+
+      <form id="quizForm"></form>
+
+      <div class="actions">
+        <button id="submitBtn" type="button">Submit</button>
+        <button id="resetBtn" type="button" class="secondary">Reset</button>
+      </div>
+
+      <div id="scoreBox" aria-live="polite">
+        <strong>Score:</strong> Not submitted yet.
+      </div>
+    </div>
+  </div>
+
+<script>
+  // 50 questions: 20 reading + 30 grammar
+  const questions = [
+    // Reading (20)
+    { q:"Where did the traveling salesman walk?", options:["On a dusty road","In a big city","On a mountain","Near the sea"], a:0 },
+    { q:"Why did the salesman feel sad?", options:["No one wanted to buy his goods","He lost his money","He was sick","He missed his home"], a:0 },
+    { q:"What was the village like?", options:["Small and quiet","Big and noisy","Cold and snowy","Busy and loud"], a:0 },
+    { q:"Where did the salesman go to find new customers?", options:["Near the forest","To the market","To the river","To the school"], a:0 },
+    { q:"What did he suddenly hear?", options:["A strange sound","Music","A bell","A dog bark"], a:0 },
+    { q:"What animal did he find?", options:["A tanuki","A cat","A bird","A dog"], a:0 },
+    { q:"How did the tanuki look?", options:["Scared and weak","Happy and strong","Angry and loud","Big and fast"], a:0 },
+    { q:"What did the salesman do to the branches?", options:["He moved them gently","He broke them","He burned them","He painted them"], a:0 },
+    { q:"What did the tanuki do after it was free?", options:["It ran away","It stayed with the man","It slept","It swam away"], a:0 },
+    { q:"What did the salesman find the next day?", options:["An old kettle","A new bag","A book","A hat"], a:0 },
+    { q:"What was the kettle like at first?", options:["Rusty, dirty, and ugly","New and clean","Small and cute","Shiny and new"], a:0 },
+    { q:"What did the salesman do at night?", options:["He washed and rubbed the kettle","He sold tools","He slept in the forest","He cooked rice"], a:0 },
+    { q:"Where did he take the kettle?", options:["To a temple","To a river","To a farm","To a store"], a:0 },
+    { q:"Who bought the kettle?", options:["The monks","The villagers","The children","The salesman"], a:0 },
+    { q:"Why did the monks need the kettle?", options:["For a tea ceremony","For a party","For a race","For a game"], a:0 },
+    { q:"What happened during the ceremony?", options:["The kettle became cold fast and moved when hot","The kettle broke","The kettle disappeared","The kettle sang"], a:0 },
+    { q:"What did the kettle change into?", options:["A tanuki","A bird","A monk","A cat"], a:0 },
+    { q:"Why did the tanuki become a kettle?", options:["To thank the salesman","To scare the monks","To hide forever","To sell tea"], a:0 },
+    { q:"Why didn’t the tanuki like being a kettle?", options:["Being too hot hurt","It was too small","It was boring","It was too light"], a:0 },
+    { q:"What happened at the end of the story?", options:["The tanuki stayed at the temple and the salesman visited often","The tanuki left the country","The monks sold the temple","The salesman stopped traveling"], a:0 },
+
+    // Grammar (30)
+    { q:"The salesman ___ along the dusty road.", options:["walked","walk","walks","walking"], a:0 },
+    { q:"He ___ tired after walking all day.", options:["was","is","are","were"], a:0 },
+    { q:"He carried cups, bowls, cloth, ___ tools.", options:["and","but","or","so"], a:0 },
+    { q:"He wanted to ___ his goods.", options:["sell","sold","selling","sells"], a:0 },
+    { q:"The villagers had ___ seen his things.", options:["already","always","never","soon"], a:0 },
+    { q:"He walked ___ the edge of the village.", options:["to","on","in","from"], a:0 },
+    { q:"He walked near the ___.", options:["forest","kettle","cup","bowl"], a:0 },
+    { q:"Suddenly, he ___ a strange sound.", options:["heard","hear","hears","hearing"], a:0 },
+    { q:"The sound came ___ the forest.", options:["from","to","at","for"], a:0 },
+    { q:"He stopped and listened ___.", options:["carefully","careful","care","caring"], a:0 },
+
+    { q:"The tanuki looked ___ a raccoon.", options:["like","at","for","with"], a:0 },
+    { q:"It was stuck ___ the branches.", options:["between","under","across","inside"], a:0 },
+    { q:"It looked scared and ___.", options:["weak","weaken","weakly","weakness"], a:0 },
+    { q:"He gently ___ the branches.", options:["moved","move","moves","moving"], a:0 },
+    { q:"He ___ the tanuki.", options:["freed","free","frees","freeing"], a:0 },
+    { q:"After it was free, it ___ away.", options:["ran","run","runs","running"], a:0 },
+    { q:"The next day, he walked his ___ road.", options:["usual","usually","use","using"], a:0 },
+    { q:"He saw a kettle on the ___.", options:["ground","tree","sky","roof"], a:0 },
+    { q:"The kettle was rusty and ___.", options:["dirty","clean","fresh","soft"], a:0 },
+    { q:"He decided to ___ it.", options:["clean","cleaned","cleaning","cleans"], a:0 },
+
+    { q:"That night, he ___ the kettle.", options:["washed","wash","washes","washing"], a:0 },
+    { q:"He rubbed it with a ___.", options:["cloth","tool","branch","tail"], a:0 },
+    { q:"After cleaning, it became ___.", options:["shiny","shine","shined","shining"], a:0 },
+    { q:"He took the kettle ___ a temple.", options:["to","in","on","at"], a:0 },
+    { q:"The monks were very ___.", options:["serious","seriously","seriousness","more seriously"], a:0 },
+    { q:"They bought it for a tea ___.", options:["ceremony","forest","village","customer"], a:0 },
+    { q:"___ the ceremony, something strange happened.", options:["During","Between","Under","Beside"], a:0 },
+    { q:"The kettle became cold very ___.", options:["fast","faster","fastest","fastly"], a:0 },
+    { q:"They had to ___ it again and again.", options:["heat","hot","heated","heating"], a:0 },
+    { q:"The tanuki stayed at the temple as a ___.", options:["guest","customer","tool","branch"], a:0 },
+  ];
+
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  // build a shuffled model on every load/refresh/reset
+  let model = [];
+
+  function buildModel(){
+    model = questions.map((q) => {
+      const opts = q.options.map((t, idx)=>({t, idx}));
+      shuffle(opts);
+      const correctIndex = opts.findIndex(o=>o.idx===q.a);
+      return { q: q.q, options: opts.map(o=>o.t), correctIndex };
+    });
+  }
+
+  function render(){
+    const form = document.getElementById("quizForm");
+    form.innerHTML = "";
+    model.forEach((item, i)=>{
+      const div = document.createElement("div");
+      div.className="q";
+      div.id=`q_${i}`;
+      div.innerHTML = `
+        <div class="qhead">
+          <div class="qnum">${i+1}.</div>
+          <div class="qtext">${item.q}</div>
+        </div>
+        <ul class="opts">
+          ${item.options.map((opt, k)=>`
+            <li class="opt">
+              <label>
+                <input type="radio" name="q${i}" value="${k}">
+                ${String.fromCharCode(65+k)}. ${opt}
+              </label>
+            </li>
+          `).join("")}
+        </ul>
+        <div class="feedback" id="fb_${i}"></div>
+      `;
+      form.appendChild(div);
+    });
+
+    document.getElementById("scoreBox").innerHTML = "<strong>Score:</strong> Not submitted yet.";
+    document.getElementById("submitBtn").disabled = false;
+  }
+
+  function submit(){
+    let score = 0;
+    const total = model.length;
+
+    // clear old styles
+    for(let i=0;i<total;i++){
+      document.getElementById(`q_${i}`).classList.remove("wrong");
+      const fb=document.getElementById(`fb_${i}`);
+      fb.classList.remove("wrong");
+      fb.textContent="";
+    }
+
+    for(let i=0;i<total;i++){
+      const chosen = document.querySelector(`input[name="q${i}"]:checked`);
+      const picked = chosen ? Number(chosen.value) : null;
+
+      if(picked !== null && picked === model[i].correctIndex){
+        score++;
+      } else {
+        document.getElementById(`q_${i}`).classList.add("wrong");
+        const fb=document.getElementById(`fb_${i}`);
+        fb.classList.add("wrong");
+        fb.textContent="Incorrect.";
+      }
+    }
+
+    document.getElementById("scoreBox").innerHTML = `<strong>Score:</strong> ${score} / ${total} (1 point each)`;
+
+    // disable after submit
+    document.querySelectorAll("#quizForm input").forEach(x=>x.disabled=true);
+    document.getElementById("submitBtn").disabled = true;
+  }
+
+  function reset(){
+    buildModel();  // new shuffle
+    render();      // clears answers by re-rendering
+  }
+
+  // Init: shuffle on every open/refresh
+  buildModel();
+  render();
+
+  document.getElementById("submitBtn").addEventListener("click", submit);
+  document.getElementById("resetBtn").addEventListener("click", reset);
+</script>
+</body>
+</html>
